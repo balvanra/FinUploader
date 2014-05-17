@@ -1,0 +1,25 @@
+release 7;
+datawindow(units=0 timer_interval=0 color=16777215 processing=1 HTMLDW=no print.documentname="" 
+print.orientation = 0 print.margin.left = 110 print.margin.right = 110 print.margin.top = 96 print.margin.bottom = 96 
+print.paper.source = 0 print.paper.size = 0 print.prompt=no print.buttons=no print.preview.buttons=no grid.lines=0 )
+header(height=76 color="536870912" )
+summary(height=0 color="536870912" )
+footer(height=0 color="536870912" )
+detail(height=72 color="536870912" )
+table(
+column=(type=number updatewhereclause=no name=stlpec dbname="stlpec" ) 
+column=(type=number updatewhereclause=no name=miesto dbname="miesto" ) 
+column=(type=number updatewhereclause=no name=id dbname="id" ) 
+column=(type=char(10) updatewhereclause=no name=typ_skupiny dbname="typ_skupiny" ) 
+column=(type=char(200) updatewhereclause=no name=nazov dbname="nazov" ) )
+text(band=header alignment="2" text="Stlpec" border="6" color="0" x="9" y="8" height="60" width="219"  name=stlpec_t  font.face="Arial CE" font.height="-9" font.weight="400"  font.family="2" font.pitch="2" font.charset="238" background.mode="2" background.color="12632256" )
+text(band=header alignment="2" text="Miesto" border="6" color="0" x="238" y="8" height="60" width="219"  name=miesto_t  font.face="Arial CE" font.height="-9" font.weight="400"  font.family="2" font.pitch="2" font.charset="238" background.mode="2" background.color="12632256" )
+text(band=header alignment="2" text="Id" border="6" color="0" x="466" y="8" height="60" width="219"  name=id_t  font.face="Arial CE" font.height="-9" font.weight="400"  font.family="2" font.pitch="2" font.charset="238" background.mode="2" background.color="12632256" )
+text(band=header alignment="2" text="Typ Skupiny" border="6" color="0" x="695" y="8" height="60" width="320"  name=typ_skupiny_t  font.face="Arial CE" font.height="-9" font.weight="400"  font.family="2" font.pitch="2" font.charset="238" background.mode="2" background.color="12632256" )
+text(band=header alignment="0" text="Nazov" border="6" color="0" x="1024" y="8" height="60" width="933"  font.face="Arial CE" font.height="-9" font.weight="400"  font.family="2" font.pitch="2" font.charset="238" background.mode="2" background.color="12632256" )
+column(band=detail id=1 alignment="1" tabsequence=10 border="0" color="0" x="9" y="4" height="64" width="219" format="[general]"  name=stlpec edit.limit=0 edit.case=any edit.focusrectangle=no edit.autoselect=yes edit.autohscroll=yes  font.face="Arial CE" font.height="-9" font.weight="400"  font.family="2" font.pitch="2" font.charset="238" background.mode="1" background.color="553648127" )
+column(band=detail id=2 alignment="1" tabsequence=20 border="0" color="0" x="238" y="4" height="64" width="219" format="[general]"  name=miesto edit.limit=0 edit.case=any edit.focusrectangle=no edit.autoselect=yes edit.autohscroll=yes  font.face="Arial CE" font.height="-9" font.weight="400"  font.family="2" font.pitch="2" font.charset="238" background.mode="1" background.color="553648127" )
+column(band=detail id=3 alignment="1" tabsequence=30 border="0" color="0" x="466" y="4" height="64" width="219" format="[general]"  name=id edit.limit=0 edit.case=any edit.focusrectangle=no edit.autoselect=yes edit.autohscroll=yes  font.face="Arial CE" font.height="-9" font.weight="400"  font.family="2" font.pitch="2" font.charset="238" background.mode="1" background.color="553648127" )
+column(band=detail id=4 alignment="0" tabsequence=40 border="0" color="0" x="695" y="4" height="64" width="320" format="[general]"  name=typ_skupiny edit.limit=0 edit.case=any edit.focusrectangle=no edit.autoselect=yes edit.autohscroll=yes  font.face="Arial CE" font.height="-9" font.weight="400"  font.family="2" font.pitch="2" font.charset="238" background.mode="1" background.color="553648127" )
+column(band=detail id=5 alignment="0" tabsequence=0 border="0" color="0" x="1029" y="4" height="64" width="928"  name=nazov  font.face="Arial CE" font.height="-9" font.weight="400"  font.family="2" font.pitch="2" font.charset="238" background.mode="1" background.color="553648127" )htmltable(border="1" )htmlgen(clientevents="1" clientvalidation="1" clientcomputedfields="1" clientformatting="0" clientscriptable="0" generatejavascript="1" )
+data(1,1,68555851,"DIMENZIA","1. mesiac 2014",1,2,1,"TYP","Real",2,1,68555851,"DIMENZIA","",2,2,58236496,"TYP","Plán 2014",3,1,68555852,"DIMENZIA","2. mesiac 2014",3,2,1,"TYP","Real",4,1,68555852,"DIMENZIA","",4,2,58236496,"TYP","Plán 2014",5,1,68555853,"DIMENZIA","3. mesiac 2014",5,2,1,"TYP","Real",6,1,68555853,"DIMENZIA","",6,2,58236496,"TYP","Plán 2014",)

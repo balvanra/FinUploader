@@ -10,5 +10,10 @@
 	<classpathentry kind="lib" path="libs/poi-ooxml-schemas-3.10-FINAL-20140208.jar"/>
 	<classpathentry kind="lib" path="libs/xmlbeans-2.3.0.jar"/>
 	<classpathentry kind="lib" path="libs/ojdbc6.jar"/>
+	<classpathentry kind="lib" path="libs/jdpapi-java-1.0.1.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="FinUploader/libs"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

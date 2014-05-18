@@ -3,6 +3,8 @@ package asol.fin.uploader.writer;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.BuiltinFormats;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -17,8 +19,11 @@ import asol.fin.uploader.DataCell;
 import asol.fin.uploader.Format;
 import asol.fin.uploader.PresentationInfo;
 import asol.fin.uploader.Table;
+import asol.fin.uploader.Uploader;
 
 public class XLSXWriter implements Writer {
+
+	private static Logger L = LogManager.getLogger(XLSXWriter.class.getName());
 
 	String defaultSheetName = "Data";
 	String defaultNumberFormat = "#,##0.00";
@@ -36,6 +41,8 @@ public class XLSXWriter implements Writer {
 	}
 
 	public XLSXWriter(String destPath) {
+		L.debug("init: " + destPath);
+		
 		this.setDestPath(destPath);
 	}
 

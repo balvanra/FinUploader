@@ -1,13 +1,18 @@
 package asol.fin.uploader;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Properties;
 
 public class UploaderProperties {
-	private final static String CONF_NAME = "finuploader.properties";
+	public final static String CONF_NAME = "finuploader.properties";
 
 	public final static String YES = "Y";
 	public final static String NO = "N";
+
+	Properties p = new Properties();
 
 	String dest_db_user;
 	String dest_db_pwd;
@@ -19,15 +24,17 @@ public class UploaderProperties {
 	String refresh_presentations;
 
 	public UploaderProperties() {
-		// TODO Auto-generated constructor stub
 	}
 
-	private String getStringPropertyThrowException(Properties p, String key)
-			throws Exception {
+	private String getStringPropertyThrowException(Properties p, String key,
+			boolean required) throws Exception {
 		try {
 			String s = p.getProperty(key);
 			if (s == null) {
-				throw new NullPointerException("Nenastavene " + key);
+				if (required)
+					throw new NullPointerException("Nenastavene " + key);
+				else
+					return null;
 			} else
 				return s;
 		} catch (Exception e) {
@@ -38,28 +45,38 @@ public class UploaderProperties {
 	private int getIntPropertyThrowException(Properties p, String key)
 			throws Exception {
 		try {
-			return Integer.parseInt(getStringPropertyThrowException(p, key));
+			return Integer.parseInt(getStringPropertyThrowException(p, key,
+					true));
 		} catch (Exception e) {
 			throw new Exception("Chyba pri citani cisla " + key, e);
 		}
 	}
 
 	public void loadProperties() throws Exception {
-		Properties p = new Properties();
 		try {
 			p.load(new FileInputStream(CONF_NAME));
 
-			setDest_db(getStringPropertyThrowException(p, "dest_db"));
-			setDest_db_user(getStringPropertyThrowException(p, "dest_db_user"));
-			setDest_db_pwd(getStringPropertyThrowException(p, "dest_db_pwd"));
-			setExport_path(getStringPropertyThrowException(p, "export_path"));
+			setDest_db(getStringPropertyThrowException(p, "dest_db", true));
+			setDest_db_user(getStringPropertyThrowException(p, "dest_db_user",
+					true));
+			setDest_db_pwd(getStringPropertyThrowException(p, "dest_db_pwd",
+					false));
+			setExport_path(getStringPropertyThrowException(p, "export_path",
+					true));
 			setCurrent_user(getIntPropertyThrowException(p, "current_user"));
 			setRefresh_presentations(getStringPropertyThrowException(p,
-					"refresh_presentations"));
+					"refresh_presentations", true));
 
 		} catch (Exception e) {
 			throw new Exception("Chyba konfiguracneho suboru " + CONF_NAME, e);
 		}
+	}
+
+	public void saveProperties() throws Exception {
+		if (p == null)
+			throw new NullPointerException("Nenacitany subor " + CONF_NAME);
+
+		p.store(new FileOutputStream(CONF_NAME), "comment");
 	}
 
 	public String getDest_db_user() {

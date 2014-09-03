@@ -1,5 +1,10 @@
 package asol.fin.uploader;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.text.DateFormat;
 import java.util.Date;
 
@@ -58,13 +63,17 @@ public class PresentationInfo {
 		this.data = data;
 	}
 
+	public String getStringData() throws UnsupportedEncodingException {
+		return new String(getData(), "windows-1250");
+	}
+
 	@Override
 	public String toString() {
-		return String.format("id:%d name:%s author:%s create:%s refresh:%s size:%d",getId(),
-				getName(), getAuthor(),
-				DateFormat.getDateInstance().format(getCreated()), DateFormat
-						.getDateInstance().format(getRefreshed()),
-				getDataLength());
+		return String.format(
+				"id:%d name:%s author:%s create:%s refresh:%s size:%d",
+				getId(), getName(), getAuthor(), DateFormat.getDateInstance()
+						.format(getCreated()), DateFormat.getDateInstance()
+						.format(getRefreshed()), getDataLength());
 	}
 
 	public int getId() {
@@ -73,6 +82,16 @@ public class PresentationInfo {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	private String getTraceFileName() {
+		return "trace_" + getId() + ".srd";
+	}
+
+	public String flushData2TraceFile() throws IOException {
+		String fname = getTraceFileName();
+		Files.write(Paths.get(fname), getData(), StandardOpenOption.CREATE);
+		return fname;
 	}
 
 }

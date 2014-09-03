@@ -1,15 +1,20 @@
-create or replace view fin_view_presentation2publish as SELECT p.prezentacia_id,
+create or replace view fin_view_presentation2publish as 
+SELECT p.prezentacia_id,
        p.nazov_prezentacie,
        p.popis_prezentacie,
        p.datum_vytvorenia,
        ps.datum_obcerstvenia,
        ps.syntax,
-       o.priezvisko || ' ' || o.meno zalozil
-  FROM dl.fin_prezentacia        p,
-       dl.fin_prezentacia_syntax ps,
-       dl.dl_user                u,
-       dl.dl_osoba               o
+       o.priezvisko || ' ' || o.meno zalozil,
+       a.nazov_adresara,
+       u.user_id as subscriber_user_id
+  FROM dl.fin_prezentacia         p,
+       dl.fin_prezentacia_adresar a,
+       dl.fin_prezentacia_syntax  ps,
+       dl.dl_user                 u,
+       dl.dl_osoba                o
  WHERE p.prezentacia_id = ps.prezentacia_id AND
+       p.adresar_id = a.adresar_id AND
        p.popis_prezentacie LIKE '/%' AND
        p.zalozil_id = u.user_id AND
        u.osoba_id = o.osoba_id;

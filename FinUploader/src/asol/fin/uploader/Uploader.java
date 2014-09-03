@@ -3,7 +3,6 @@ package asol.fin.uploader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 import org.apache.logging.log4j.LogManager;
@@ -20,18 +19,18 @@ public class Uploader {
 
 	private static Logger L = LogManager.getLogger(Uploader.class.getName());
 
-	EncryptedPassword cipher;
 	UploaderProperties prop;
-	DBHelper db;
-	PresentationReader reader;
+	Reader reader;
 	Writer writer;
 
-	public Uploader() {
+	public Uploader(Reader reader, Writer writer) {
+		this.reader = reader;
+		this.writer = writer;
 	}
 
-	public void publishPresentation(Reader reader, Writer writer,
-			PresentationInfo info) throws Exception {
-		String data = reader.readData();
+	public void publishPresentation(Writer writer, PresentationInfo info)
+			throws Exception {
+		String data = info.getStringData();
 		Parser parser = new FinDataParser(data);
 		Table table = parser.getData();
 		writer.write(table, info);
@@ -40,14 +39,30 @@ public class Uploader {
 	public void setup() throws Exception {
 		this.prop = new UploaderProperties();
 		prop.loadProperties();
+		writer.init(prop.getExport_path());
+		reader.setup(prop);
+	}
 
-		reader = new PresentationReader();
-		writer = new XLSXWriter(prop.getExport_path());
+	public void upload() throws Exception {
 
-		this.cipher = new EncryptedPassword();
-		String decryptedPassword = null;
+		if (reader.readData()) {
+			for (PresentationInfo presentationInfo : reader) {
+				L.info(presentationInfo);
+				try {
+					publishPresentation(writer, presentationInfo);
+				} catch (Exception e) {
+					String tracefile = presentationInfo.flushData2TraceFile();
+					L.fatal(String.format(
+							"Error with presentation: %d %s - tracefile: %s",
+							presentationInfo.getId(),
+							presentationInfo.getName(), tracefile), e);
+				}
+			}
+		}
+	}
 
-
+	void checkPasswordAndExit() {
+		EncryptedPassword cipher = new EncryptedPassword();
 		String encryptedPassword = prop.getDest_db_pwd();
 		if (encryptedPassword == null) {
 			System.out.println("Zadajte heslo do db: ");
@@ -66,43 +81,6 @@ public class Uploader {
 			System.out.println(String.format("dest_db_pwd=%s",
 					encryptedPassword));
 			System.exit(0);
-		} else {
-			decryptedPassword = cipher.getDecryptedPassword(encryptedPassword);
-
-			db = new DBHelper(prop.getDest_db_user(), decryptedPassword,
-					prop.getDest_db(), prop.getCurrent_user());
-		}
-
-	}
-
-	public void upload() throws Exception {
-
-		ArrayList<PresentationInfo> pl = null;
-
-		if (prop.isRefresh_presentations()) {
-			pl = db.fetchPresentations(false);
-			for (PresentationInfo presentationInfo : pl) {
-				L.debug(presentationInfo);
-				db.refreshPresentation(presentationInfo);
-			}
-		}
-
-		pl = db.fetchPresentations(true);
-
-		for (PresentationInfo presentationInfo : pl) {
-			L.info(presentationInfo);
-			try {
-				reader.setInfo(presentationInfo);
-				publishPresentation(reader, writer, presentationInfo);
-			} catch (Exception e) {
-				String fname = "trace_" + presentationInfo.getId() + ".srd";
-				L.fatal(String.format(
-						"Error with presentation: %d %s - tracefile: %s",
-						presentationInfo.getId(), presentationInfo.getName(),
-						fname), e);
-				Files.write(Paths.get(fname), presentationInfo.getData(),
-						StandardOpenOption.CREATE);
-			}
 		}
 	}
 
@@ -114,9 +92,13 @@ public class Uploader {
 			try {
 				L.info("Entering.");
 
-				Uploader u = new Uploader();
+				PresentationReader reader = new PresentationReader();
+				XLSXWriter writer = new XLSXWriter();
+
+				Uploader u = new Uploader(reader, writer);
 
 				u.setup();
+				u.checkPasswordAndExit();
 				u.upload();
 
 				/**

@@ -33,6 +33,9 @@ public class XLSXWriter implements Writer {
 	String destPath;
 
 	public String getDestPath() {
+		if (destPath == null)
+			throw new NullPointerException("destPath not initialized");
+
 		return destPath;
 	}
 
@@ -40,10 +43,7 @@ public class XLSXWriter implements Writer {
 		this.destPath = destPath;
 	}
 
-	public XLSXWriter(String destPath) {
-		L.debug("init: " + destPath);
-		
-		this.setDestPath(destPath);
+	public XLSXWriter() {
 	}
 
 	@Override
@@ -55,6 +55,7 @@ public class XLSXWriter implements Writer {
 		int offsetRow = 1;
 		int offsetCol = 0;
 
+		fillHeader(sheet, info);
 		fillSheet(sheet, table, offsetRow, offsetCol);
 
 		for (int i = 0; i < table.getDimensionCols(); i++) {
@@ -68,6 +69,15 @@ public class XLSXWriter implements Writer {
 		namedCel3.setRefersToFormula(reference);
 
 		flushWorkbook(wb, info);
+	}
+
+	private void fillHeader(Sheet sheet, PresentationInfo info) {
+		Row row = sheet.createRow(0);
+		Cell cell = row.createCell(0);
+		String message = String
+				.format("Dáta k %1$td.%1$tm.%1$tY %1$tT. Prezentácia: %3$s, kontakt: %2$s.",
+						info.getRefreshed(), info.getAuthor(), info.getName());
+		cell.setCellValue(message);
 	}
 
 	private void fillSheet(Sheet sheet, Table table, int rowoffset,
@@ -127,5 +137,11 @@ public class XLSXWriter implements Writer {
 			if (workbook != null)
 				workbook.dispose();
 		}
+	}
+
+	@Override
+	public void init(String destination) {
+		L.debug("init: " + destination);
+		this.setDestPath(destination);
 	}
 }

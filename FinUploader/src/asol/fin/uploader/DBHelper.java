@@ -1,6 +1,5 @@
 package asol.fin.uploader;
 
-import java.io.InputStream;
 import java.sql.CallableStatement;
 import java.sql.Clob;
 import java.sql.Connection;
@@ -14,6 +13,7 @@ import java.util.ArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.util.IOUtils;
+import org.apache.xmlbeans.impl.common.ReaderInputStream;
 
 public class DBHelper {
 
@@ -26,14 +26,17 @@ public class DBHelper {
 	String _jdbcUrl;
 	int _current_user;
 
-	String SQL_PRESENTATIONS = "SELECT prezentacia_id,"
+	final String SQL_PRESENTATIONS = "SELECT prezentacia_id,"
 			+ "     nazov_prezentacie," + "     popis_prezentacie,"
 			+ "     datum_vytvorenia," + "     datum_obcerstvenia,"
 			+ "     syntax," + "     zalozil "
-			+ "  FROM dl.fin_view_presentation2publish "
-			+ " WHERE subscriber_user_id = ?";
+			+ "  FROM dl.fin_view_presentation2publish ";
 
-	String REFRESH_PRESENTATION = "BEGIN "
+	final String SQL_WHERE_SUBSCRIBER = " WHERE subscriber_user_id = ?";
+
+	final int ALL_USERS = 0;
+
+	final String REFRESH_PRESENTATION = "BEGIN "
 			+ "  dl.pkfinprezentacie.pVytvorPrezentaciu(?);" + " END; ";
 
 	public DBHelper(String dbusername, String dbpwd, String jdbcUrl,
@@ -53,8 +56,15 @@ public class DBHelper {
 		PreparedStatement pstmt = null;
 		try {
 			L.debug("prepareStatement");
-			pstmt = c.prepareStatement(SQL_PRESENTATIONS);
-			pstmt.setInt(1, _current_user);
+			if (_current_user == ALL_USERS) {
+				L.debug("-all users");
+				pstmt = c.prepareStatement(SQL_PRESENTATIONS);
+			} else {
+				L.debug(String.format("-current_user %d", _current_user));
+				pstmt = c.prepareStatement(SQL_PRESENTATIONS
+						+ SQL_WHERE_SUBSCRIBER);
+				pstmt.setInt(1, _current_user);
+			}
 			L.debug("executeQuery");
 			rs = pstmt.executeQuery();
 
@@ -67,16 +77,21 @@ public class DBHelper {
 				i.setId(rs.getInt("prezentacia_id"));
 				i.setAuthor(rs.getString("zalozil"));
 				i.setName(rs.getString("nazov_prezentacie"));
-				i.setCreated(rs.getDate("datum_vytvorenia"));
-				i.setRefreshed(rs.getDate("datum_obcerstvenia"));
+				i.setCreated(rs.getTimestamp("datum_vytvorenia"));
+				i.setRefreshed(rs.getTimestamp("datum_obcerstvenia"));
 				if (fetchBlobs) {
 					Clob clob = rs.getClob("syntax");
 					L.debug("clob.length() " + clob.length());
-					InputStream bs = clob.getAsciiStream();
+					ReaderInputStream bs = new ReaderInputStream(
+							clob.getCharacterStream(), "windows-1250");
 					L.debug("bs.available() " + bs.available());
 					byte[] byte_array = IOUtils.toByteArray(bs);
 					L.debug("byte_array.length: " + byte_array.length);
 					i.setData(byte_array);
+					if (L.isDebugEnabled()) {
+						L.debug(String.format("tracefile - %s",
+								i.flushData2TraceFile()));
+					}
 				}
 				L.debug(i);
 
